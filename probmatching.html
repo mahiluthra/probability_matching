@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Task 5</title>
+    <script src="jspsych-6.0.4/jspsych.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-html-button-response-pmatching.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-pmatching-feedback.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-image-button-response-pmatching.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-pregame.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
+    <script src="jspsych-6.0.4/plugins/jspsych-survey-multi-choice.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="jspsych-6.0.4/css/jspsych-pmatching.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body></body>
+  <script>
+
+/*create timeline*/
+var timeline = [];
+
+var nPractice = 5
+
+var nMain = 100
+
+var randomOptions = ["0","1"]
+
+var probs = [60,70,80]
+
+var www = [0,1]
+
+var weights = [50,50]
+
+var totalPoints = 0
+var totalPoints1 = 0
+var totalPoints2 = 0
+var totalPoints3 = 0
+
+var nTrials = 0
+var gameN = "Practice Rounds"
+
+var color = "yellow"
+
+var possColors = ["blue", "purple", "orange"]
+
+//timeline.push(welcome);
+
+
+/*set up experiment instructions*/
+var instructions1 = {
+  type: "instructions",
+  pages: function(){
+  var pageOne = '<div style="font-size:20px;"><b>INSTRUCTIONS</b><br><br>Welcome to the final task.<br><br>For this task, you will play 3 games. <br>During each game, you will be shown a Bulb Box.<br>The Bulb Box is a device containing two lightbulbs: Bulb A and Bulb B.<br><br>Below is an image of a Bulb Box:<br><img src="img/bulbbox.png" style="width:800px; height:450px"></img></div>'
+  var pageTwo ="<div style='font-size:20px;'>Each game consists of 100 rounds and during each round one of the two lightbulbs in the Bulb Box will turn on.<br>The lightbulbs turn on and off based on a program determined by that particular Bulb Box.<br><br>Your task is to guess which lightbulb will turn on for each round.<br>To choose a lightbulb, simply click on the labeled button on top of the lighbulb.<br><br>After you choose a lightbulb, you will be shown which lightbulb turned on (as determined by the Bulb Box program).<br><b>If you guessed correctly, you win 1 Game Point.<br>If you guessed wrong, you lose 1 Game Point.</b><br><br>Each of the three games has a different Bulb Box and is run by a different Bulb Box program.<br>There is a certain chance element to the functioning of each Bulb Box program.<br>It is not possible for you to get all your predictions correct in the games.<br><br></div>"
+  var pageThree = "<div style='font-size:20px;'><b>By winning a certain total number of Game Points by the end of the task, you can get between 1 to 3 nutrition bars!</b><br>Therefore, the more Game Points you earn, the more likely you are to get the nutrition bars.<br><br>We will now start with few practice rounds to get you accustomed to the Bulb Box.<br>Click 'Next' to start the practice rounds.<br><br></div>"
+  return [pageOne, pageTwo, pageThree]
+  },
+      allow_backward: false,
+  show_clickable_nav: true,
+  button_label_next: "Next",
+  on_finish: function(){
+      colorName = jsPsych.randomization.sampleWithReplacement(possColors, 1)[0]
+      possColors.splice(possColors.indexOf(colorName), 1)
+    }
+};
+
+var instructions2 = {
+  on_start: function(){
+    color = colorName
+  },
+  type: "instructions",
+  pages: function(){
+  var pageOne = "<div style='font-size:20px;'>You won <font color='blue'>"+totalPoints+" out of "+nPractice+"</font> possible game points during the practice rounds. <br><br>We will now start with GAME 1 which contains a "+colorName+" Bulb Box.<br><br>Click below to begin Game 1.<br><br></div>"//<br>Before we start there is one more thing we want to tell you.<br>There is a certain amount of chance element to which lightbulb turns on.<br>There is no pattern that the Bulb Box program follows.<br>Your task is to make as many correct predictions as possible, so as to maximize your Game Points.<br><br>Click below to begin Game 1.<br><br></div>"
+  return [pageOne]
+},
+  allow_backward: false,
+  show_clickable_nav: true,
+  button_label_next: "Start",
+  on_finish: function(){
+    totalPoints = 0
+    gameN = "Game 1"
+    nTrials = 0
+    var probWeight = jsPsych.randomization.sampleWithReplacement(probs, 1)[0]
+    probs.splice(probs.indexOf(probWeight), 1)
+	weights = jsPsych.randomization.sampleWithReplacement([[probWeight,100-probWeight],[100-probWeight,probWeight]], 1)[0]
+    colorName = jsPsych.randomization.sampleWithReplacement(possColors, 1)[0]
+    possColors.splice(possColors.indexOf(colorName), 1)
+
+  }
+};
+
+var instructions3 = {
+  on_start: function(){
+    color = colorName
+  },
+  type: "instructions",
+  pages: function(){
+  var pageOne = "<div style='font-size:20px;'>You won <font color='blue'>"+totalPoints+" out of "+nMain+"</font> possible game points during Game 1. <br><br>We will now start with Game 2.<br>Game 2 contains a "+colorName+" Bulb Box and is run by a different Bulb Box program.<br><br>Click below to begin Game 2.<br><br></div>"
+  return [pageOne]
+},
+  allow_backward: false,
+  show_clickable_nav: true,
+  button_label_next: "Start",
+  on_finish: function(){
+    totalPoints1 = totalPoints
+    totalPoints = 0
+    gameN = "Game 2"
+    nTrials = 0
+    probWeight = jsPsych.randomization.sampleWithReplacement(probs, 1)[0]
+    probs.splice(probs.indexOf(probWeight), 1)
+    weights = jsPsych.randomization.sampleWithReplacement([[probWeight,100-probWeight],[100-probWeight,probWeight]], 1)[0]
+    colorName = jsPsych.randomization.sampleWithReplacement(possColors, 1)[0]
+    possColors.splice(possColors.indexOf(colorName), 1)
+  }
+};
+
+var instructions4 = {
+  on_start: function(){
+    color = colorName
+  },
+  type: "instructions",
+  pages: function(){
+  var pageOne = "<div style='font-size:20px;'>You won <font color='blue'>"+totalPoints+" out of "+nMain+"</font> possible game points during Game 2.<br><br>We will now start with Game 3.<br>Game 3 contains an "+colorName+" Bulb Box and is run by a different Bulb Box program.<br><br>Click below to begin Game 3.<br><br></div>"
+  return [pageOne]
+},
+  allow_backward: false,
+  show_clickable_nav: true,
+  button_label_next: "Start",
+  on_finish: function(){
+    totalPoints2 = totalPoints
+    totalPoints = 0
+    gameN = "Game 3"
+    nTrials = 0
+    probWeight = jsPsych.randomization.sampleWithReplacement(probs, 1)[0]
+    probs.splice(probs.indexOf(probWeight), 1)
+    weights = jsPsych.randomization.sampleWithReplacement([[probWeight,100-probWeight],[100-probWeight,probWeight]], 1)[0]
+  }
+};
+
+
+var instructions5 = {
+  type: "survey-text",
+  preamble: "You won <font color='blue'>"+totalPoints+" out of "+nMain+"</font> possible game points during Game 3.<br>The task is complete. Please answer the following questions:",
+  questions: function(){
+  var question1 = "(1) Did you use a strategy to make accurate predictions during the games?<br>If yes, please describe the strategy below. If no, type 'Don't know'."
+  var question2 = "(2) Imagine that a jar is filled with 60 red and 40 green marbles.<br>The marbles are pulled out of the jar one after the other. <br> You have to guess the color of each marble before it is pulled out.<br>Which of the following strategies would you choose to make the highest number of correct guesses?<br><br><b>Strategy A:</b> Go by intuition, switching when there has been too many of one color or the other.<br><b>Strategy B:</b> Predict the more likely color (red) most of the time, but occasionally predict green.<br><b>Strategy D:</b> Predict the more likely color (red) all the time.<br><b>Strategy C:</b> Predict red 60% of the time and green 40% of the time.<br><b>Strategy D:</b> Predict the more likely color (red) all the time.<br>Type in the strategy letter below."
+abc = [{prompt: question1, rows:2, columns:50}, {prompt: question2, rows:1, columns:30}]
+  return abc
+},
+  // allow_backward: false,
+  // show_clickable_nav: true,
+  button_label: "Next"
+}
+
+  /*fixation point*/
+  var fixation = {
+    type: 'html-keyboard-response',
+    stimulus: '<div style="font-size:60px;">+</div>',
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 500
+  }
+
+
+  var decisions = {
+    type: "html-button-response-pmatching",
+    stimulus: '<div style="font-size:30px;"><b>!!CHOOSE!!</b><br><br></div>',
+    choices :["<div style='font-size:30px;'><br></div><br><img src ='img/lightbulb.png' style='width:220px; height:280px;'></img>",
+    "<div style='font-size:30px;'><br></div><br><img src ='img/lightbulb.png' style='width:220px; height:280px;'></img>"],
+    button_html: function(){
+      return ['<button class="jspsych-btn-fb">%choice%</button>', '<button class="jspsych-btn-fb">%choice%</button>']
+    },
+    color_btn: function(){
+      return color
+    },
+    totals: function(){
+      return [totalPoints, nTrials, gameN]
+    }
+  }
+
+  var choose_button = {
+    type: "pregame",
+    choices: [""],
+    totals: function(){
+      return [totalPoints, nTrials, gameN]
+    }
+  }
+
+
+  var feedback = {
+    type: "pmatching-feedback",
+    choices: function(){
+      var result = ["<div style='font-size:30px;'><br></div><br><img src ='img/lightbulb.png' style='width:220px; height:280px;'></img>",
+    "<div style='font-size:30px;'><br></div><br><img src ='img/lightbulb.png' style='width:220px; height:280px;'></img>"]
+      randomChoice = jsPsych.randomization.sampleWithReplacement(randomOptions, 1, weights)[0];
+      console.log(randomChoice)
+      if (randomChoice == "0") { //double equal to
+        result[0] = "<div style='font-size:30px;'><br></div><br><img src ='img/"+color+"lightbulb.png' style='width:220px; height:280px;'></img>"}
+      else {
+        result[1] = "<div style='font-size:30px;'><br></div><br><img src ='img/"+color+"lightbulb.png' style='width:220px; height:280px;'></img>"}
+        return result
+      },
+    button_html: ['<button class="jspsych-btn-fb">%choice%</button>', '<button class="jspsych-btn-fb">%choice%</button>'],
+    stimulus: function(){
+      nTrials+=1
+      var fbText = ""
+       last_trial_pressed = jsPsych.data.get().last(2).values()[0].button_pressed;
+       if (randomChoice==last_trial_pressed){
+         totalPoints+=1
+         fbText+= '<div style="font-size:35px; color: rgb(0,220,0); margin:1px;"><b>YOU WIN<br><br>1 GAME POINT!!</b><br><br></div>'
+       } else {
+         totalPoints -=1
+        fbText+= '<div style="font-size:35px; color: rgb(250,0,0); margin:1px;"><b>YOU LOSE<br><br>1 GAME POINT!!</b><br><br></div>'
+        }
+      return fbText },
+    data: function(){
+      if ((weights[0]>weights[1] && last_trial_pressed == 0) || (weights[0]<weights[1] && last_trial_pressed == 1)){
+          max = 1
+      } else {
+        max = 0
+      }
+
+      return {points: totalPoints, correctBulb: randomChoice, choiceWeights: weights, maximizing: max, TrialNum: nTrials}
+    },
+    color_btn: function(){
+      return color
+    },
+    totals: function(){
+      return [totalPoints, nTrials, gameN]
+    }
+  }
+
+  var isi = {
+    type: 'html-keyboard-response',
+    stimulus: '<div style="font-size:60px;"> </div>',
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 0
+  }
+
+  var conclusion = {
+    type: 'html-keyboard-response',
+    stimulus: function(){
+      totPoint = totalPoints1+ totalPoints2+totalPoints
+      if (totPoint<0){
+        nutrition =0
+      } else if (totPoint<90){
+        nutrition = 1
+      } else if(totPoint<120){
+        nutrition = 2
+      } else{
+        nutrition = 3
+      }
+      return '<div style="font-size:20px;">This task is over.<br><br>Thank you for your participation in this task. <br><br>Your points in Game 1: <b>'+totalPoints1+' out of '+nMain+'</b><br>Your points in Game 2: <b>'+totalPoints2+' out of '+nMain+'</b><br>Your points in Game 3: <b>'+totalPoints+' out of '+nMain+'</b><br><font color="blue">Your total Game Points: <b>'+ totPoint+' out of '+ (3*nMain)+'</font></b><br><br> Based on your scores, <b><font color="blue">you get '+nutrition+' nutrition bar(s).</font></b></div>'
+  },
+    choices: jsPsych.NO_KEYS
+  }
+
+  var p_details = {
+    type:"survey-text",
+    questions: [{prompt: "Enter subject number"}],
+    on_finish:function(){
+      partN = jsPsych.data.get().last(1).values()[0].partNum
+//      console.log(partN[0])
+    }
+  }
+
+  function saveData(filename, filedata){
+        $.ajax({
+              type:'post',
+              cache: false,
+              url: 'save_data.php', // this is the path to the above PHP script
+              data: {filename: filename, filedata: filedata}
+        });
+  };
+  var IDsub = Date.now()
+
+
+  var dataLog1 = {
+   type: 'html-keyboard-response',
+   stimulus: " ",
+   trial_duration: 100,
+   on_finish: function(data) {
+        saveData("WM_prob_matching_practice_"+partN+"_"+IDsub.toString()+".csv", jsPsych.data.get().csv());
+  }
+  }
+
+  var dataLog2 = {
+   type: 'html-keyboard-response',
+   stimulus: " ",
+   trial_duration: 100,
+   on_finish: function(data) {
+        var data1 = jsPsych.data.get().filter([{trial_type: "html-button-response-pmatching"}, {trial_type: "pmatching-feedback"}]).last(200);
+        saveData("WM_prob_matching_game-1_"+partN+"_"+IDsub.toString()+".csv", data1.csv());
+  }
+  }
+
+  var dataLog3 = {
+   type: 'html-keyboard-response',
+   stimulus: " ",
+   trial_duration: 100,
+   on_finish: function(data) {
+        var data2 = jsPsych.data.get().filter([{trial_type: "html-button-response-pmatching"}, {trial_type: "pmatching-feedback"}]).last(200);
+        saveData("WM_prob_matching_game-2_"+partN+"_"+IDsub.toString()+".csv", data2.csv());
+  }
+  }
+
+  var dataLog4 = {
+   type: 'html-keyboard-response',
+   stimulus: " ",
+   trial_duration: 100,
+   on_finish: function(data) {
+        var data3 = jsPsych.data.get().filter([{trial_type: "html-button-response-pmatching"}, {trial_type: "pmatching-feedback"}]).last(200);
+        saveData("WM_prob_matching_game-3_"+partN+"_"+IDsub.toString()+".csv", data3.csv());
+  }
+  }
+
+  var dataLog5 = {
+   type: 'html-keyboard-response',
+   stimulus: " ",
+   trial_duration: 100,
+   on_finish: function(data) {
+        var data = jsPsych.data.get().last(3);
+        saveData("WM_prob_matching_strategy_"+partN+"_"+IDsub.toString()+".csv", data.csv());
+  }
+  }
+
+// var demo_rounds = {
+//   timeline: [fixation, test, feedback_demo],
+//   repetitions: 1
+// }
+
+//timeline.push(demo_rounds)
+
+//timeline.push(instructions)
+var demo_procedure = {
+   timeline: [decisions, fixation, feedback],
+   repetitions: nPractice
+ }
+
+ var test_procedure = {
+    timeline: [decisions, fixation, feedback],
+    repetitions: nMain
+  }
+
+  timeline.push(p_details)
+  timeline.push({
+    type: 'fullscreen',
+    fullscreen_mode: true
+  });
+
+  timeline.push(instructions1)
+  timeline.push(choose_button)
+  timeline.push(demo_procedure)
+  timeline.push(dataLog1)
+  timeline.push(instructions2)
+  timeline.push(choose_button)
+  timeline.push(test_procedure)
+  timeline.push(dataLog2)
+  timeline.push(instructions3)
+  timeline.push(choose_button)
+  timeline.push(test_procedure)
+  timeline.push(dataLog3)
+  timeline.push(instructions4)
+  timeline.push(choose_button)
+  timeline.push(test_procedure)
+  timeline.push(dataLog4)
+  timeline.push(instructions5)
+  timeline.push({
+    type: 'fullscreen',
+    fullscreen_mode: false
+  });
+
+  timeline.push(dataLog5)
+
+
+  timeline.push(conclusion)
+
+  var images = ['img/bulbbox.png', 'img/blankbox.png', 'img/yellowlightbulb.png', 'img/bluelightbulb.png', , 'img/purplelightbulb.png', , 'img/orangelightbulb.png', , 'img/lightbulb.png']
+
+//timeline.push(points);
+
+/* start the experiment */
+jsPsych.init({
+  timeline: timeline,
+  preload_images: images,
+  on_finish: function() {
+  jsPsych.data.displayData();
+}
+});
+</script>
+</html>
